@@ -14,6 +14,7 @@ import ProductList from "./components/ProductList.jsx";
 import ProductDetail from "./components/ProductDetail.jsx";
 import Cart from "./components/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
+import OrderSuccess from "./pages/OrderSuccess.jsx";
 
 // ROUTES: App acts as layout
 const router = createBrowserRouter([
@@ -26,6 +27,8 @@ const router = createBrowserRouter([
       { path: "/product/:id", element: <ProductDetail /> },
       { path: "/cart", element: <Cart /> },
       { path: "/checkout", element: <Checkout /> },
+      { path: "/order-success", element: <OrderSuccess /> },
+
     ],
   },
 ]);
