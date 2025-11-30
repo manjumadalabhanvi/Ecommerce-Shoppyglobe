@@ -1,9 +1,10 @@
+// src/components/ProductList.jsx
 import React from "react";
-import ProductItem from "./ProductItem";
 import { useFetchProducts } from "../hooks/useFetchProducts";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 import { useNavigate } from "react-router-dom";
+import ProductItem from "./ProductItem";
 
 function ProductList() {
   const { products, loading, error } = useFetchProducts();
@@ -12,7 +13,7 @@ function ProductList() {
 
   const handleAddToCart = (product) => {
     dispatch(addToCart(product));
-    navigate("/cart"); 
+    navigate("/cart");
   };
 
   if (loading) return <p className="p-6 text-center">Loading products...</p>;
