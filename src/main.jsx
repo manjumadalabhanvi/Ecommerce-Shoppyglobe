@@ -7,7 +7,7 @@ import App from "./App.jsx";
 import store from "./redux/store.js";
 import "./index.css";
 
-// 🔥 LAZY LOADED COMPONENTS
+// lazy load pages and main components for better performance
 const Home = lazy(() => import("./pages/Home.jsx"));
 const ProductList = lazy(() => import("./components/ProductList.jsx"));
 const ProductDetail = lazy(() => import("./components/ProductDetail.jsx"));
@@ -16,15 +16,19 @@ const Checkout = lazy(() => import("./pages/Checkout.jsx"));
 const OrderSuccess = lazy(() => import("./pages/OrderSuccess.jsx"));
 const NotFound = lazy(() => import("./pages/NotFound.jsx"));
 
+// application routes using createBrowserRouter
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    
+    // show custom 404 page for unknown routes
     errorElement: (
       <Suspense fallback={<p className="p-6 text-center">Loading...</p>}>
         <NotFound />
       </Suspense>
     ),
+
     children: [
       { index: true, element: <Home /> },
       { path: "products", element: <ProductList /> },
@@ -36,6 +40,7 @@ const router = createBrowserRouter([
   },
 ]);
 
+// render app and wrap with redux provider and suspense
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>

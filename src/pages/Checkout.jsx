@@ -4,10 +4,12 @@ import { clearCart } from "../redux/cartSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function Checkout() {
+  // get cart items from redux store
   const cart = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // form state for user details
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -17,7 +19,7 @@ export default function Checkout() {
 
   const [error, setError] = useState("");
 
-  // If cart empty
+  // if cart is empty, show message
   if (!cart || cart.length === 0) {
     return (
       <div className="p-6 text-center">
@@ -32,14 +34,18 @@ export default function Checkout() {
     );
   }
 
+  // calculate total price
   const total = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
-  const handleChange = (e) =>
+  // handle form input change
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
+  // basic form validation
   const validate = () => {
     if (!form.name || !form.email || !form.address || !form.phone) {
       setError("Please fill all fields");
@@ -53,17 +59,18 @@ export default function Checkout() {
     return true;
   };
 
+  // place order, clear cart and redirect to success page
   const handlePlaceOrder = () => {
-  if (!validate()) return;
+    if (!validate()) return;
 
-  dispatch(clearCart());
-  navigate("/order-success"); // ✅ ABSOLUTE PATH (IMPORTANT)
-};
-
+    dispatch(clearCart());        // clear cart after order
+    navigate("/order-success");   // go to order success page
+  };
 
   return (
     <div className="p-6 max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
-      {/* Billing */}
+      
+      {/* billing details form */}
       <div className="border p-6 rounded-lg shadow">
         <h2 className="text-2xl font-bold mb-4">Billing Details</h2>
 
@@ -88,7 +95,7 @@ export default function Checkout() {
         </button>
       </div>
 
-      {/* Summary */}
+      {/* order summary */}
       <div className="border p-6 rounded-lg shadow">
         <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
 

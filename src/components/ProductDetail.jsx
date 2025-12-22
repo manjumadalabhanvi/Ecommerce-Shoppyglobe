@@ -1,20 +1,26 @@
-// src/components/ProductDetail.jsx
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFetchProduct } from "../hooks/useFetchProduct";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
-import { useNavigate } from "react-router-dom";
 
 export default function ProductDetail() {
+  // get product id from route params
   const { id } = useParams();
+
+  // fetch single product details using custom hook
   const { product, loading, error } = useFetchProduct(id);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // show loading state
   if (loading) return <p className="p-6">Loading...</p>;
+
+  // show error message if fetch fails
   if (error) return <p className="p-6 text-red-500">{error}</p>;
 
+  // add product to cart and redirect to cart page
   const handleAdd = () => {
     dispatch(addToCart(product));
     navigate("/cart");
@@ -22,18 +28,24 @@ export default function ProductDetail() {
 
   return (
     <div className="p-6 flex gap-10">
-
+      
+      {/* product image */}
       <img
         src={product.thumbnail}
-        loading="lazy"
         alt={product.title}
+        loading="lazy"   // lazy load image for better performance
         className="w-80 rounded-lg shadow"
       />
 
+      {/* product details */}
       <div>
-        <h1 className="text-3xl font-bold mb-3">{product.title}</h1>
+        <h1 className="text-3xl font-bold mb-3">
+          {product.title}
+        </h1>
 
-        <p className="text-gray-700 mb-4">{product.description}</p>
+        <p className="text-gray-700 mb-4">
+          {product.description}
+        </p>
 
         <p className="text-2xl font-semibold text-green-600 mb-4">
           ₹{product.price}
@@ -46,7 +58,6 @@ export default function ProductDetail() {
           Add to Cart
         </button>
       </div>
-
     </div>
   );
 }
