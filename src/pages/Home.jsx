@@ -18,7 +18,7 @@ function Home() {
     }, 3000);
 
     return () => clearInterval(timerRef.current);
-  });
+  }, [images.length]);
 
   const nextSlide = () => {
     clearInterval(timerRef.current);
