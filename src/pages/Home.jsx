@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Home() {
+  /* ---------- SLIDER ---------- */
   const images = [
     "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
     "https://images.unsplash.com/photo-1503602642458-232111445657",
@@ -11,14 +12,13 @@ function Home() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef(null);
 
-  // auto slide every 3 seconds
   useEffect(() => {
     timerRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 3000);
 
     return () => clearInterval(timerRef.current);
-  }, [images.length]); // ✅ ESLint satisfied
+  });
 
   const nextSlide = () => {
     clearInterval(timerRef.current);
@@ -32,9 +32,22 @@ function Home() {
     );
   };
 
+  /* ---------- FEATURED PRODUCTS ---------- */
+  const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("https://dummyjson.com/products?limit=3")
+      .then((res) => res.json())
+      .then((data) => setProducts(data.products))
+      .catch((err) => console.error(err));
+  }, []);
+
   return (
-    <div className="p-4 sm:p-6 text-center max-w-6xl mx-auto">
-      <div className="relative mb-8">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+      
+      {/* ---------- SLIDER ---------- */}
+      <div className="relative mb-10">
         <img
           src={images[current]}
           alt="banner"
@@ -57,20 +70,59 @@ function Home() {
         </button>
       </div>
 
-      <h1 className="text-3xl sm:text-4xl font-bold text-amber-500 mb-4">
-        Welcome to ShoppyGlobe!
+      {/* ---------- HEADING ---------- */}
+      <h1 className="text-3xl sm:text-4xl font-bold text-amber-500 text-center mb-4">
+        Welcome to ShoppyGlobe
       </h1>
-
-      <p className="mb-6 text-gray-600">
+      <p className="text-center text-gray-600 mb-10">
         Your one-stop shop for awesome products.
       </p>
 
-      <Link
-        to="/products"
-        className="inline-block px-6 py-2 bg-amber-500 text-white rounded hover:bg-amber-400"
-      >
-        View Products
-      </Link>
+      {/* ---------- FEATURED PRODUCTS ---------- */}
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        Featured Products
+      </h2>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="border rounded-lg p-4 hover:shadow-lg"
+          >
+            <img
+              src={product.thumbnail}
+              alt={product.title}
+              loading="lazy"
+              className="w-full h-48 object-cover rounded mb-4"
+            />
+
+            <h3 className="font-semibold text-lg">
+              {product.title}
+            </h3>
+
+            <p className="text-amber-500 font-bold mb-3">
+              ₹{product.price}
+            </p>
+
+            <button
+              onClick={() => navigate(`/product/${product.id}`)}
+              className="w-full bg-amber-500 text-white py-2 rounded hover:bg-amber-400"
+            >
+              View Details
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* ---------- VIEW ALL ---------- */}
+      <div className="text-center mt-10">
+        <Link
+          to="/products"
+          className="inline-block px-6 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+        >
+          View All Products
+        </Link>
+      </div>
     </div>
   );
 }

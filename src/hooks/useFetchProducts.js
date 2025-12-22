@@ -1,26 +1,135 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useFetchProducts } from "../hooks/useFetchProducts";
 
-export const useFetchProducts = () => {
-  const [products, setProducts] = useState([]); // store product list
-  const [loading, setLoading] = useState(true); // loading indicator
-  const [error, setError] = useState(null);     // error message if fetch fails
+function Home() {
+  /* ---------- SLIDER DATA ---------- */
+  const images = [
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+    "https://images.unsplash.com/photo-1503602642458-232111445657",
+    "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+  ];
 
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef(null);
+
+  /* ---------- AUTO SLIDER ---------- */
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("https://dummyjson.com/products");
-        if (!res.ok) throw new Error("Failed to fetch products");
-        const data = await res.json();
-        setProducts(data.products); // save products
-      } catch (err) {
-        setError(err.message); // save error
-      } finally {
-        setLoading(false); // stop loading
-      }
-    };
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % images.length);
+    }, 3000);
 
-    fetchProducts(); // call the async function
-  }, []); // runs only once when component mounts
+    return () => clearInterval(timerRef.current);
+  }, [images.length]);
 
-  return { products, loading, error }; // expose to any component
-};
+  const nextSlide = () => {
+    clearInterval(timerRef.current);
+    setCurrent((prev) => (prev + 1) % images.length);
+  };
+
+  const prevSlide = () => {
+    clearInterval(timerRef.current);
+    setCurrent((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+
+  /* ---------- FETCH PRODUCTS USING HOOK ---------- */
+  const { products, loading, error } = useFetchProducts();
+  const featuredProducts = products.slice(0, 3);
+  const navigate = useNavigate();
+
+  return (
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+
+      {/* ---------- SLIDER ---------- */}
+      <div className="relative mb-10">
+        <img
+          src={images[current]}
+          alt="banner"
+          loading="lazy"
+          className="w-full h-56 sm:h-72 md:h-80 object-cover rounded-lg pointer-events-none"
+        />
+
+        <button
+          onClick={prevSlide}
+          className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-1 rounded z-10"
+        >
+          ‹
+        </button>
+
+        <button
+          onClick={nextSlide}
+          className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white px-3 py-1 rounded z-10"
+        >
+          ›
+        </button>
+      </div>
+
+      {/* ---------- INTRO ---------- */}
+      <h1 className="text-3xl sm:text-4xl font-bold text-amber-500 text-center mb-4">
+        Welcome to ShoppyGlobe
+      </h1>
+
+      <p className="text-center text-gray-600 mb-10">
+        Your one-stop shop for awesome products.
+      </p>
+
+      {/* ---------- FEATURED PRODUCTS ---------- */}
+      <h2 className="text-2xl font-bold text-center mb-6">
+        Featured Products
+      </h2>
+
+      {loading && (
+        <p className="text-center">Loading products...</p>
+      )}
+
+      {error && (
+        <p className="text-center text-red-500">{error}</p>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {featuredProducts.map((product) => (
+          <div
+            key={product.id}
+            className="border rounded-lg p-4 hover:shadow-lg"
+          >
+            <img
+              src={product.thumbnail}
+              alt={product.title}
+              loading="lazy"
+              className="w-full h-48 object-cover rounded mb-4"
+            />
+
+            <h3 className="font-semibold text-lg mb-1">
+              {product.title}
+            </h3>
+
+            <p className="text-amber-500 font-bold mb-3">
+              ₹{product.price}
+            </p>
+
+            <button
+              onClick={() => navigate(`/product/${product.id}`)}
+              className="w-full bg-amber-500 text-white py-2 rounded hover:bg-amber-400"
+            >
+              View Details
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* ---------- VIEW ALL ---------- */}
+      <div className="text-center mt-10">
+        <Link
+          to="/products"
+          className="inline-block px-6 py-2 bg-gray-800 text-white rounded hover:bg-gray-700"
+        >
+          View All Products
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default Home;
